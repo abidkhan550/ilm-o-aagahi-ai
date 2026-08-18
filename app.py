@@ -25,11 +25,20 @@ st.markdown("""
         background-attachment: fixed;
         font-family: 'Montserrat', 'Noto Nastaliq Urdu', sans-serif;
     }
-    /* ٹیبز کے متن کا رنگ اور ڈیزائن صاف کرنے کے لیے */
+    /* تمام ٹیبز کا متن سفید رکھیں (غیر منتخب) */
     .stTabs [data-baseweb="tab"] p {
         color: #ffffff !important;
-        font-weight: bold !important;
+        font-weight: normal !important; /* ہلکا وزن */
+        font-size: 15px !important;
+        opacity: 0.8 !important; /* تھوڑی سی مدھم */
+    }
+    
+    /* صرف منتخب (Active) ٹیب کا متن گہرا نیلا کریں */
+    .stTabs [data-baseweb="tab"][aria-selected="true"] p {
+        color: #1e88e5 !important; /* گہرا نیلا */
+        font-weight: bold !important;  /* بولڈ */
         font-size: 16px !important;
+        opacity: 1.0 !important; /* مکمل واضح */
     }
     .stTabs [data-baseweb="tab"][aria-selected="true"] p {
         color: #1e88e5 !important;
