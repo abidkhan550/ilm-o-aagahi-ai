@@ -5,17 +5,24 @@ from PIL import Image
 from google import genai
 from google.genai import types
 
-# ۱. لوکل تصویر پڑھنے کا فنکشن
+# ۱. ویب پیج کی سیٹنگز
+st.set_page_config(
+    page_title="Ilm-o-Aagahi AI - By Abid",
+    page_icon="🎓",
+    layout="centered"
+)
+
+# لوکل تصویر پڑھنے کا فنکشن
 def get_base64_image(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode('utf-8')
     return None
 
-# تصویر کا پاتھ لوڈ کرنا
-img_base64 = get_base64_image("my_pic.jpg")
+IMAGE_PATH = r"C:\Users\IMRAN   LAPTOP\my_pic.jpg" 
+img_base64 = get_base64_image(IMAGE_PATH)
 
-# ۲. CSS اسٹائلنگ
+# ۲. CSS اسٹائلنگ (Gradient Blended Title & Modern Font)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Great+Vibes&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
@@ -26,29 +33,6 @@ st.markdown("""
         font-family: 'Montserrat', 'Noto Nastaliq Urdu', sans-serif;
     }
     
-    /* تمام ٹیبز کا متن سفید رکھیں (غیر منتخب) */
-    .stTabs [data-baseweb="tab"] p {
-        color: #ffffff !important;
-        font-weight: normal !important;
-        font-size: 15px !important;
-        opacity: 0.8 !important;
-    }
-    
-    /* صرف منتخب (Active) ٹیب کا متن گہرا نیلا کریں */
-    .stTabs [data-baseweb="tab"][aria-selected="true"] p {
-        color: #1e88e5 !important;
-        font-weight: bold !important;
-        font-size: 16px !important;
-        opacity: 1.0 !important;
-    }
-    
-    /* Upload / Camera والی پوری لائن پر سیاہ بارڈر */
-    .stExpander > summary {
-        border: 2px solid #000000 !important;
-        border-radius: 10px !important;
-        background-color: rgba(255, 255, 255, 0.1) !important;
-    }
-
     /* ٹاپ کارنر میں لینگویج ڈراپ ڈاؤن */
     div[data-testid="stSelectbox"] {
         width: 150px !important;
@@ -86,6 +70,7 @@ st.markdown("""
         border: 3px solid #1e88e5;
     }
     
+    /* ویب سائٹ نام: Blended Text + Modern Montserrat Font */
     .web-title {
         margin: 0;
         font-weight: 900 !important;
@@ -97,6 +82,7 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
+    /* By Abid: Signature Style Font */
     .signature-text {
         margin: 0;
         color: #1e88e5 !important;
@@ -106,6 +92,7 @@ st.markdown("""
         margin-top: -5px;
     }
 
+    /* سفید سرچ بار */
     .stTextArea textarea {
         background-color: #ffffff !important;
         color: #111111 !important;
@@ -121,6 +108,7 @@ st.markdown("""
         font-size: 18px !important;
     }
     
+    /* Expander Layout */
     .stExpander {
         background: rgba(255, 255, 255, 0.15) !important;
         border-radius: 12px !important;
@@ -147,12 +135,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ۳. کارنر میں زبان کا انتخاب
+# ۳. کارنر میں زبان کا انتخاب (Top Right Corner)
 col_head1, col_head2 = st.columns([3, 1])
 with col_head2:
     target_language = st.selectbox(
         "Language",
-        ["English", "Urdu", "Pashto", "Arabic", "Hindi", "Spanish", "French"]
+        ["English", "Urdu (اردو)", "Pashto (پښتو)", "Arabic (العربية)", "Hindi (हिंदी)", "Spanish", "French"]
     )
 
 # ۴. ہیڈر
@@ -172,14 +160,14 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ۵. API Key اور AI سیشن
-API_KEY = st.secrets["API_KEY"]
+API_KEY = "AQ.Ab8RN6K1kfCsvhZg50d5-ADQoJHjfXYkY8-u_CrQbbvMJVpYOQ"
 client = genai.Client(api_key=API_KEY)
 
 # ۶. Attachment Options
 uploaded_image = None
 camera_image = None
 
-with st.expander("📎 Add Image / Camera Option", expanded=False):
+with st.expander("📎 Add Image / Camera Option (تصویر یا کیمرا)", expanded=False):
     tab1, tab2 = st.tabs(["📁 Upload Image", "📷 Take Photo"])
     
     with tab1:
@@ -200,7 +188,7 @@ final_image = camera_image if camera_image else uploaded_image
 user_text = st.text_area("Ask Ilm-o-Aagahi AI...", height=100, placeholder="Ask anything or attach media...", label_visibility="collapsed")
 
 # 🚀 Ask Button
-if st.button("🚀 Ask AI"):
+if st.button("🚀 Ask / جواب حاصل کریں"):
     if user_text or final_image:
         with st.spinner("Processing..."):
             contents_list = []
@@ -211,23 +199,14 @@ if st.button("🚀 Ask AI"):
             elif final_image and not user_text:
                 contents_list.append(f"Please read all educational content in this image and explain/solve it thoroughly in {target_language}.")
 
-            try:
-                # system_instruction میں صرف خالص انگریزی الفاظ استعمال کیے گئے ہیں تاکہ انکوڈنگ کا مسئلہ نہ ہو
-                response = client.models.generate_content(
-                    model="gemini-1.5-flash",
-                    contents=contents_list,
-                    config=types.GenerateContentConfig(
-                        system_instruction=f"You are an expert AI educational tutor named Abid. Strictly respond in {target_language}. Explain step-by-step.",
-                    ),
-                )
-                st.success("Answer:")
-                
-                if response and hasattr(response, 'text'):
-                    st.markdown(response.text)
-                else:
-                    st.write("No response generated.")
-                    
-            except Exception as e:
-                st.error(f"An error occurred: {str(e)}")
+            response = client.models.generate_content(
+                model="gemini-3.6-flash",
+                contents=contents_list,
+                config=types.GenerateContentConfig(
+                    system_instruction=f"You are an expert AI educational tutor named Abid working for 'Ilm-o-Aagahi AI'. Strictly respond in {target_language}. Explain step-by-step.",
+                ),
+            )
+            st.success("Answer / جواب:")
+            st.write(response.text)
     else:
         st.warning("Please enter a question or attach an image first!")
