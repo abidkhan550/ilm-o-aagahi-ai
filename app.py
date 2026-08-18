@@ -6,13 +6,12 @@ from google import genai
 from google.genai import types
 
 # ۱. ویب پیج کی سیٹنگز
-st.set_page_config(
-    page_title="Ilm-o-Aagahi AI - By Abid",
-    page_icon="col1, col2 = st.columns([1, 4])
+col1, col2 = st.columns([1, 4])
 with col1:
-    st.image("🎓"),
-    layout="centered"
-)
+    st.image("my_pic.jpg", width=80)
+with col2:
+    st.markdown("### Ilm-o-Aagahi AI")
+    st.markdown("*By Abid*")
 
 # لوکل تصویر پڑھنے کا فنکشن
 def get_base64_image(image_path):
