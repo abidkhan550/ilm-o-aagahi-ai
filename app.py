@@ -40,6 +40,12 @@ st.markdown("""
         font-size: 16px !important;
         opacity: 1.0 !important; /* مکمل واضح */
     }
+    /* Upload / Camera والی پوری لائن پر سیاہ بارڈر */
+    .stExpander > summary {
+        border: 2px solid #000000 !important;
+        border-radius: 10px !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
+    }
     .stTabs [data-baseweb="tab"][aria-selected="true"] p {
         color: #1e88e5 !important;
     }
