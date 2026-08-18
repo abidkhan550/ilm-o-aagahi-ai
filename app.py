@@ -10,7 +10,7 @@ st.set_page_config(
     page_title="Ilm-o-Aagahi AI - By Abid",
     page_icon="col1, col2 = st.columns([1, 4])
 with col1:
-    st.image("my_pic.jpg", width=80"),
+    st.image("🎓"),
     layout="centered"
 )
 
