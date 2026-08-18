@@ -25,7 +25,15 @@ st.markdown("""
         background-attachment: fixed;
         font-family: 'Montserrat', 'Noto Nastaliq Urdu', sans-serif;
     }
-    
+    /* ٹیبز کے متن کا رنگ اور ڈیزائن صاف کرنے کے لیے */
+    .stTabs [data-baseweb="tab"] p {
+        color: #ffffff !important;
+        font-weight: bold !important;
+        font-size: 16px !important;
+    }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] p {
+        color: #1e88e5 !important;
+    }
     /* ٹاپ کارنر میں لینگویج ڈراپ ڈاؤن */
     div[data-testid="stSelectbox"] {
         width: 150px !important;
