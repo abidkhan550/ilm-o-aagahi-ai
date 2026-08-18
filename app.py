@@ -220,11 +220,17 @@ if st.button("🚀 Ask / جواب حاصل کریں"):
                     ),
                 )
                 st.success("Answer / جواب:")
-                if response and hasattr(response, 'text'):
-                    st.markdown(response.text)
-                else:
-                    st.write("No response generated.")
+                
+                # انکوڈنگ کے مسئلے سے بچنے کے لیے محفوظ طریقہ
+                answer_text = response.text if hasattr(response, 'text') else str(response)
+                st.markdown(answer_text)
+                
             except Exception as e:
-                st.error(f"An error occurred: {str(e)}")
+                # اگر پھر بھی کوئی مسئلہ آئے تو اسے UTF-8 میں انکوڈ کر کے دکھائیں
+                try:
+                    safe_error = str(e).encode('utf-8', errors='ignore').decode('utf-8')
+                    st.error(f"An error occurred: {safe_error}")
+                except:
+                    st.error("An unexpected error occurred.")
     else:
         st.warning("Please enter a question or attach an image first!")
