@@ -160,7 +160,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ۵. API Key اور AI سیشن
-API_KEY = st.secrets"AQ.Ab8RN6K1kfCsvhZg50d5-ADQoJHjfXYkY8-u_CrQbbvMJVpYOQ"
+API_KEY = st.secrets["API_KEY"]
 client = genai.Client(api_key=API_KEY)
 
 # ۶. Attachment Options
