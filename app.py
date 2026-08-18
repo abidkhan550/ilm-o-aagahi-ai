@@ -5,23 +5,17 @@ from PIL import Image
 from google import genai
 from google.genai import types
 
-# ۱. ویب پیج کی سیٹنگز
-col1, col2 = st.columns([1, 4])
-with col1:
-    st.image("my_pic.jpg", width=80)
-with col2:
-    st.markdown("### Ilm-o-Aagahi AI")
-    st.markdown("*By Abid*")
-
-# لوکل تصویر پڑھنے کا فنکشن
+# ۱. لوکل تصویر پڑھنے کا فنکشن
 def get_base64_image(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode('utf-8')
     return None
 
+# تصویر کا پاتھ لوڈ کرنا
+img_base64 = get_base64_image("my_pic.jpg")
 
-# ۲. CSS اسٹائلنگ (Gradient Blended Title & Modern Font)
+# ۲. CSS اسٹائلنگ
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Great+Vibes&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
@@ -69,7 +63,6 @@ st.markdown("""
         border: 3px solid #1e88e5;
     }
     
-    /* ویب سائٹ نام: Blended Text + Modern Montserrat Font */
     .web-title {
         margin: 0;
         font-weight: 900 !important;
@@ -81,7 +74,6 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
-    /* By Abid: Signature Style Font */
     .signature-text {
         margin: 0;
         color: #1e88e5 !important;
@@ -91,7 +83,6 @@ st.markdown("""
         margin-top: -5px;
     }
 
-    /* سفید سرچ بار */
     .stTextArea textarea {
         background-color: #ffffff !important;
         color: #111111 !important;
@@ -107,7 +98,6 @@ st.markdown("""
         font-size: 18px !important;
     }
     
-    /* Expander Layout */
     .stExpander {
         background: rgba(255, 255, 255, 0.15) !important;
         border-radius: 12px !important;
@@ -134,7 +124,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ۳. کارنر میں زبان کا انتخاب (Top Right Corner)
+# ۳. کارنر میں زبان کا انتخاب
 col_head1, col_head2 = st.columns([3, 1])
 with col_head2:
     target_language = st.selectbox(
@@ -199,7 +189,7 @@ if st.button("🚀 Ask / جواب حاصل کریں"):
                 contents_list.append(f"Please read all educational content in this image and explain/solve it thoroughly in {target_language}.")
 
             response = client.models.generate_content(
-                model="gemini-3.6-flash",
+                model="gemini-2.5-flash",
                 contents=contents_list,
                 config=types.GenerateContentConfig(
                     system_instruction=f"You are an expert AI educational tutor named Abid working for 'Ilm-o-Aagahi AI'. Strictly respond in {target_language}. Explain step-by-step.",
