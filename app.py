@@ -1,28 +1,26 @@
 import os
 import base64
+import sys
 import streamlit as st
 from PIL import Image
 from google import genai
 from google.genai import types
 
-# ۱. ویب پیج کی سیٹنگز
-st.set_page_config(
-    page_title="Ilm-o-Aagahi AI - By Abid",
-    page_icon="🎓",
-    layout="centered"
-)
+# سسٹم کی ڈیفالٹ انکوڈنگ کو UTF-8 پر سیٹ کرنا تاکہ ASCII کا مسئلہ نہ آئے
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 
-# لوکل تصویر پڑھنے کا فنکشن
+# ۱. لوکل تصویر پڑھنے کا فنکشن
 def get_base64_image(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode('utf-8')
     return None
 
-IMAGE_PATH = r"C:\Users\IMRAN   LAPTOP\my_pic.jpg" 
-img_base64 = get_base64_image(IMAGE_PATH)
+# تصویر کا پاتھ لوڈ کرنا
+img_base64 = get_base64_image("my_pic.jpg")
 
-# ۲. CSS اسٹائلنگ (Gradient Blended Title & Modern Font)
+# ۲. CSS اسٹائلنگ
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Great+Vibes&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
@@ -33,7 +31,26 @@ st.markdown("""
         font-family: 'Montserrat', 'Noto Nastaliq Urdu', sans-serif;
     }
     
-    /* ٹاپ کارنر میں لینگویج ڈراپ ڈاؤن */
+    .stTabs [data-baseweb="tab"] p {
+        color: #ffffff !important;
+        font-weight: normal !important;
+        font-size: 15px !important;
+        opacity: 0.8 !important;
+    }
+    
+    .stTabs [data-baseweb="tab"][aria-selected="true"] p {
+        color: #1e88e5 !important;
+        font-weight: bold !important;
+        font-size: 16px !important;
+        opacity: 1.0 !important;
+    }
+    
+    .stExpander > summary {
+        border: 2px solid #000000 !important;
+        border-radius: 10px !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
     div[data-testid="stSelectbox"] {
         width: 150px !important;
         float: right;
@@ -70,7 +87,6 @@ st.markdown("""
         border: 3px solid #1e88e5;
     }
     
-    /* ویب سائٹ نام: Blended Text + Modern Montserrat Font */
     .web-title {
         margin: 0;
         font-weight: 900 !important;
@@ -82,7 +98,6 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
-    /* By Abid: Signature Style Font */
     .signature-text {
         margin: 0;
         color: #1e88e5 !important;
@@ -92,7 +107,6 @@ st.markdown("""
         margin-top: -5px;
     }
 
-    /* سفید سرچ بار */
     .stTextArea textarea {
         background-color: #ffffff !important;
         color: #111111 !important;
@@ -108,7 +122,6 @@ st.markdown("""
         font-size: 18px !important;
     }
     
-    /* Expander Layout */
     .stExpander {
         background: rgba(255, 255, 255, 0.15) !important;
         border-radius: 12px !important;
@@ -135,12 +148,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ۳. کارنر میں زبان کا انتخاب (Top Right Corner)
+# ۳. کارنر میں زبان کا انتخاب
 col_head1, col_head2 = st.columns([3, 1])
 with col_head2:
     target_language = st.selectbox(
         "Language",
-        ["English", "Urdu (اردو)", "Pashto (پښتو)", "Arabic (العربية)", "Hindi (हिंदी)", "Spanish", "French"]
+        ["English", "Urdu", "Pashto", "Arabic", "Hindi", "Spanish", "French"]
     )
 
 # ۴. ہیڈر
@@ -159,15 +172,20 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# ۵. API Key اور AI سیشن
-API_KEY = "AQ.Ab8RN6K1kfCsvhZg50d5-ADQoJHjfXYkY8-u_CrQbbvMJVpYOQ"
-client = genai.Client(api_key=API_KEY)
+# ۵. API Key کو محفوظ طریقے سے لوڈ کرنا
+try:
+    raw_key = st.secrets.get("API_KEY", "AQ.Ab8RN6K1kfCsvhZg50d5-ADQoJHjfXYkY8-u_CrQbbvMJVpYOQ")
+    API_KEY = str(raw_key).encode('ascii', 'ignore').decode('ascii').strip()
+    client = genai.Client(api_key=API_KEY)
+except Exception as e:
+    st.error("API Key configuration error!")
+    client = None
 
 # ۶. Attachment Options
 uploaded_image = None
 camera_image = None
 
-with st.expander("📎 Add Image / Camera Option (تصویر یا کیمرا)", expanded=False):
+with st.expander("📎 Add Image / Camera Option", expanded=False):
     tab1, tab2 = st.tabs(["📁 Upload Image", "📷 Take Photo"])
     
     with tab1:
@@ -188,8 +206,10 @@ final_image = camera_image if camera_image else uploaded_image
 user_text = st.text_area("Ask Ilm-o-Aagahi AI...", height=100, placeholder="Ask anything or attach media...", label_visibility="collapsed")
 
 # 🚀 Ask Button
-if st.button("🚀 Ask / جواب حاصل کریں"):
-    if user_text or final_image:
+if st.button("🚀 Ask AI"):
+    if client is None:
+        st.error("Gemini Client is not initialized.")
+    elif user_text or final_image:
         with st.spinner("Processing..."):
             contents_list = []
             if final_image:
@@ -199,14 +219,25 @@ if st.button("🚀 Ask / جواب حاصل کریں"):
             elif final_image and not user_text:
                 contents_list.append(f"Please read all educational content in this image and explain/solve it thoroughly in {target_language}.")
 
-            response = client.models.generate_content(
-                model="gemini-3.6-flash",
-                contents=contents_list,
-                config=types.GenerateContentConfig(
-                    system_instruction=f"You are an expert AI educational tutor named Abid working for 'Ilm-o-Aagahi AI'. Strictly respond in {target_language}. Explain step-by-step.",
-                ),
-            )
-            st.success("Answer / جواب:")
-            st.write(response.text)
+            try:
+                # یہاں ماڈل کا نام بالکل درست gemini-2.5-flash کر دیا گیا ہے
+                response = client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=contents_list,
+                    config=types.GenerateContentConfig(
+                        system_instruction=f"You are an expert AI educational tutor named Abid. Strictly respond in {target_language}. Explain step-by-step.",
+                    ),
+                )
+                st.success("Answer:")
+                
+                if response and hasattr(response, 'text') and response.text:
+                    safe_text = str(response.text).encode('utf-8', errors='ignore').decode('utf-8')
+                    st.markdown(safe_text)
+                else:
+                    st.write("No response generated.")
+                    
+            except Exception as e:
+                err_msg = str(e).encode('utf-8', errors='ignore').decode('utf-8')
+                st.error(f"An error occurred: {err_msg}")
     else:
         st.warning("Please enter a question or attach an image first!")
