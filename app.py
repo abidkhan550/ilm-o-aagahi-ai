@@ -152,7 +152,7 @@ col_head1, col_head2 = st.columns([3, 1])
 with col_head2:
     target_language = st.selectbox(
         "Language",
-        ["English", "Urdu (اردو)", "Pashto (پښتو)", "Arabic (العربية)", "Hindi (हिंदी)", "Spanish", "French"]
+        ["English", "Urdu", "Pashto", "Arabic", "Hindi", "Spanish", "French"]
     )
 
 # ۴. ہیڈر
@@ -179,7 +179,7 @@ client = genai.Client(api_key=API_KEY)
 uploaded_image = None
 camera_image = None
 
-with st.expander("📎 Add Image / Camera Option (تصویر یا کیمرا)", expanded=False):
+with st.expander("📎 Add Image / Camera Option", expanded=False):
     tab1, tab2 = st.tabs(["📁 Upload Image", "📷 Take Photo"])
     
     with tab1:
@@ -200,7 +200,7 @@ final_image = camera_image if camera_image else uploaded_image
 user_text = st.text_area("Ask Ilm-o-Aagahi AI...", height=100, placeholder="Ask anything or attach media...", label_visibility="collapsed")
 
 # 🚀 Ask Button
-if st.button("🚀 Ask / جواب حاصل کریں"):
+if st.button("🚀 Ask AI"):
     if user_text or final_image:
         with st.spinner("Processing..."):
             contents_list = []
@@ -212,15 +212,15 @@ if st.button("🚀 Ask / جواب حاصل کریں"):
                 contents_list.append(f"Please read all educational content in this image and explain/solve it thoroughly in {target_language}.")
 
             try:
-                # یہاں ماڈل کا نام gemini-1.5-flash کر دیا گیا ہے جو بالکل درست اور سٹیبل ہے
+                # system_instruction میں صرف خالص انگریزی الفاظ استعمال کیے گئے ہیں تاکہ انکوڈنگ کا مسئلہ نہ ہو
                 response = client.models.generate_content(
                     model="gemini-1.5-flash",
                     contents=contents_list,
                     config=types.GenerateContentConfig(
-                        system_instruction=f"You are an expert AI educational tutor named Abid working for 'Ilm-o-Aagahi AI'. Strictly respond in {target_language}. Explain step-by-step.",
+                        system_instruction=f"You are an expert AI educational tutor named Abid. Strictly respond in {target_language}. Explain step-by-step.",
                     ),
                 )
-                st.success("Answer / جواب:")
+                st.success("Answer:")
                 
                 if response and hasattr(response, 'text'):
                     st.markdown(response.text)
