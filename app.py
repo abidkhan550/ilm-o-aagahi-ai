@@ -212,8 +212,9 @@ if st.button("🚀 Ask / جواب حاصل کریں"):
                 contents_list.append(f"Please read all educational content in this image and explain/solve it thoroughly in {target_language}.")
 
             try:
+                # یہاں ماڈل کا نام gemini-1.5-flash کر دیا گیا ہے جو بالکل درست اور سٹیبل ہے
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model="gemini-1.5-flash",
                     contents=contents_list,
                     config=types.GenerateContentConfig(
                         system_instruction=f"You are an expert AI educational tutor named Abid working for 'Ilm-o-Aagahi AI'. Strictly respond in {target_language}. Explain step-by-step.",
@@ -221,16 +222,12 @@ if st.button("🚀 Ask / جواب حاصل کریں"):
                 )
                 st.success("Answer / جواب:")
                 
-                # انکوڈنگ کے مسئلے سے بچنے کے لیے محفوظ طریقہ
-                answer_text = response.text if hasattr(response, 'text') else str(response)
-                st.markdown(answer_text)
-                
+                if response and hasattr(response, 'text'):
+                    st.markdown(response.text)
+                else:
+                    st.write("No response generated.")
+                    
             except Exception as e:
-                # اگر پھر بھی کوئی مسئلہ آئے تو اسے UTF-8 میں انکوڈ کر کے دکھائیں
-                try:
-                    safe_error = str(e).encode('utf-8', errors='ignore').decode('utf-8')
-                    st.error(f"An error occurred: {safe_error}")
-                except:
-                    st.error("An unexpected error occurred.")
+                st.error(f"An error occurred: {str(e)}")
     else:
         st.warning("Please enter a question or attach an image first!")
