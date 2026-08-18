@@ -20,8 +20,6 @@ def get_base64_image(image_path):
             return base64.b64encode(img_file.read()).decode('utf-8')
     return None
 
-IMAGE_PATH = r"C:\Users\IMRAN   LAPTOP\my_pic.jpg" 
-img_base64 = get_base64_image(IMAGE_PATH)
 
 # ۲. CSS اسٹائلنگ (Gradient Blended Title & Modern Font)
 st.markdown("""
